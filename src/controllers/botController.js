@@ -1,10 +1,34 @@
 const { json } = require('express');
 const Bot = require('../models/botModel');
+const User = require('../models/userModel');
 const axios = require('axios');
 const pm2 = require('pm2')
 
 const index = (req, res) => {
     res.json({ "message": 'Bienvenido a la Bot API - Autenticado', "user": req.user });
+};
+
+const list = async (req, res) => {
+    const user = await User.findById(req.user.id);
+    if (!user.status) return res.status(401).send({
+        status: "error",
+        message: 'Status inactive'
+    })
+    else {
+        try {
+            const bots = await Bot.find({ user: req.user.id });
+            res.status(200).send({
+                status: "success",
+                message: 'Bots retrieved successfully',
+                bots
+            });
+        } catch (err) {
+            res.status(500).send({
+                status: "error",
+                message: 'Error getting bots'
+            });
+        }
+    }
 };
 
 const register = async (req, res) => {
@@ -230,5 +254,5 @@ const qr = async (req, res) => {
 }
 
 module.exports = {
-    index, register, status, qr, start, stop
+    index, register, status, qr, start, stop, list
 };

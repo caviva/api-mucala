@@ -38,5 +38,7 @@ router.post('/upload-avatar', [check.auth, upload.single("avatar")], userControl
 
 router.get('/avatar', check.auth, userController.sendAvatar);
 
+router.put('/change-status/:userId', check.auth, userController.changeStatus);
+
 
 module.exports = router;

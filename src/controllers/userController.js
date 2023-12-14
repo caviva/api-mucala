@@ -233,7 +233,7 @@ const uploadAvatar = async (req, res) => {
             message: 'Invalid extension',
         });
     }
-    
+
     try {
         const userUpdated = await User.findOneAndUpdate({ _id: req.user.id }, { avatar: fileName }, { new: true });
 
@@ -295,6 +295,64 @@ const sendAvatar = async (req, res) => {
     }
 };
 
+const changeStatus = async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(401).send({
+        status: "error",
+        message: 'Unauthorized'
+    })
+    else {
+        try {
+            if (!req.params.userId) {
+                return res.status(400).send({
+                    status: "error",
+                    message: 'All fields are required'
+                });
+            }
+
+            const user = await User.findById(req.params.userId);
+
+            if (!user) {
+                return res.status(400).send({
+                    status: "error",
+                    message: 'User does not exist'
+                });
+            }
+
+            user.status = !user.status;
+
+            const userUpdated = await user.save();
+
+            if (userUpdated) {
+                res.status(200).send({
+                    status: "success",
+                    message: 'User status updated successfully',
+                    user: {
+                        id: user._id,
+                        name: user.name,
+                        username: user.username,
+                        email: user.email,
+                        phone: user.phone,
+                        avatar: user.avatar,
+                        role: user.role,
+                        status: user.status,
+                        createdAt: user.createdAt
+                    }
+                });
+            } else {
+                res.status(400).send({
+                    status: "error",
+                    message: 'Error updating user'
+                });
+            }
+        } catch (err) {
+            res.status(500).send({
+                status: "error",
+                message: 'Error updating user'
+            });
+        }
+    }
+}
+
 module.exports = {
-    index, register, login, profile, update, uploadAvatar, sendAvatar
+    index, register, login, profile, update, uploadAvatar, sendAvatar, changeStatus
 };
