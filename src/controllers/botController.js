@@ -1,10 +1,7 @@
 const { json } = require('express');
 const Bot = require('../models/botModel');
-const Docker = require('dockerode');
 const axios = require('axios');
 const pm2 = require('pm2')
-
-const docker = new Docker({ host: process.env.DOCKER_HOST, port: 2375 });
 
 const index = (req, res) => {
     res.json({ "message": 'Bienvenido a la Bot API - Autenticado', "user": req.user });
@@ -233,5 +230,5 @@ const qr = async (req, res) => {
 }
 
 module.exports = {
-    index, register, status, qr
+    index, register, status, qr, start, stop
 };
