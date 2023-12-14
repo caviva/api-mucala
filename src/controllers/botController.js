@@ -2,6 +2,7 @@ const { json } = require('express');
 const Bot = require('../models/botModel');
 const Docker = require('dockerode');
 const axios = require('axios');
+const pm2 = require('pm2')
 
 const docker = new Docker({ host: process.env.DOCKER_HOST, port: 2375 });
 
@@ -83,31 +84,18 @@ const status = async (req, res) => {
             });
         }
 
-        const containerId = bot.containerId;
-
-        try {
-            const container = docker.getContainer(containerId);
-            const containerInfo = await container.inspect();
-            let jsonContainerInfo = JSON.stringify(containerInfo);
-            jsonContainerInfo = JSON.parse(jsonContainerInfo);
-
-            res.status(200).send({
-                status: "success",
-                message: 'Container found successfully',
-                container: {
-                    id: containerId,
-                    status: jsonContainerInfo.State.Status,
-                    running: jsonContainerInfo.State.Running,
-                    paused: jsonContainerInfo.State.Paused,
-                }
-            });
-        } catch (error) {
-            console.log(error);
-            return res.status(400).send({
-                status: "error",
-                message: 'Container not found'
-            });
-        }
+        pm2.describe(bot.pm2, (err, description) => {
+            if (err) {
+                console.error(err);
+            } else {
+                const statuspm2 = description[0] ? description[0].pm2_env.status : 'No en ejecución';
+                res.status(200).send({
+                    status: "success",
+                    message: 'Bot status retrieved successfully',
+                    pm2: statuspm2
+                });
+            }
+        });
 
     } catch (err) {
         res.status(500).send({
@@ -115,7 +103,7 @@ const status = async (req, res) => {
             message: 'Error getting bot status'
         });
     }
-};
+}
 
 const stop = async (req, res) => {
     try {
@@ -142,40 +130,24 @@ const stop = async (req, res) => {
             });
         }
 
-        const containerId = bot.containerId;
-
-        try {
-            const container = docker.getContainer(containerId);
-            await container.stop();
-            const containerInfo = await container.inspect();
-            let jsonContainerInfo = JSON.stringify(containerInfo);
-            jsonContainerInfo = JSON.parse(jsonContainerInfo);
-
-            res.status(200).send({
-                status: "success",
-                message: 'Container stopped successfully',
-                container: {
-                    id: containerId,
-                    status: jsonContainerInfo.State.Status,
-                    running: jsonContainerInfo.State.Running,
-                    paused: jsonContainerInfo.State.Paused,
-                }
-            });
-        } catch (error) {
-            console.log(error);
-            return res.status(400).send({
-                status: "error",
-                message: 'Container not found'
-            });
-        }
+        pm2.stop(bot.pm2, (err, description) => {
+            if (err) {
+                console.error(err);
+            } else {
+                res.status(200).send({
+                    status: "success",
+                    message: 'Bot stopped successfully'
+                });
+            }
+        });
 
     } catch (err) {
         res.status(500).send({
             status: "error",
-            message: 'Error getting bot status'
+            message: 'Error stopping bot'
         });
     }
-};
+}
 
 const start = async (req, res) => {
     try {
@@ -202,40 +174,24 @@ const start = async (req, res) => {
             });
         }
 
-        const containerId = bot.containerId;
-
-        try {
-            const container = docker.getContainer(containerId);
-            await container.start();
-            const containerInfo = await container.inspect();
-            let jsonContainerInfo = JSON.stringify(containerInfo);
-            jsonContainerInfo = JSON.parse(jsonContainerInfo);
-
-            res.status(200).send({
-                status: "success",
-                message: 'Container started successfully',
-                container: {
-                    id: containerId,
-                    status: jsonContainerInfo.State.Status,
-                    running: jsonContainerInfo.State.Running,
-                    paused: jsonContainerInfo.State.Paused,
-                }
-            });
-        } catch (error) {
-            console.log(error);
-            return res.status(400).send({
-                status: "error",
-                message: 'Container not found'
-            });
-        }
+        pm2.start(bot.pm2, (err, description) => {
+            if (err) {
+                console.error(err);
+            } else {
+                res.status(200).send({
+                    status: "success",
+                    message: 'Bot started successfully'
+                });
+            }
+        });
 
     } catch (err) {
         res.status(500).send({
             status: "error",
-            message: 'Error getting bot status'
+            message: 'Error starting bot'
         });
     }
-};
+}
 
 const qr = async (req, res) => {
     try {
@@ -277,5 +233,5 @@ const qr = async (req, res) => {
 }
 
 module.exports = {
-    index, register, status, stop, start, qr
+    index, register, status, qr
 };

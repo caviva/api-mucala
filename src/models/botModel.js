@@ -13,7 +13,7 @@ const botSchema = new Schema({
         type: String,
         required: true,
     },
-    containerId: {
+    pm2: {
         type: String,
     },
     status: {
