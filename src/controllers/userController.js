@@ -39,7 +39,18 @@ const register = async (req, res) => {
         if (userStored) {
             res.status(200).send({
                 status: "success",
-                message: 'User saved successfully'
+                message: 'User saved successfully',
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    username: user.username,
+                    email: user.email,
+                    phone: user.phone,
+                    avatar: user.avatar,
+                    role: user.role,
+                    status: user.status,
+                    createdAt: user.createdAt
+                }
             });
         } else {
             res.status(400).send({
@@ -59,14 +70,14 @@ const login = async (req, res) => {
     try {
         let params = req.body;
 
-        if (!params.username || !params.password) {
+        if (!params.email || !params.password) {
             return res.status(400).send({
                 status: "error",
                 message: 'All fields are required'
             });
         }
 
-        const user = await User.findOne({ username: params.username });
+        const user = await User.findOne({ email: params.email });
 
         if (!user) {
             return res.status(400).send({
