@@ -89,7 +89,7 @@ const login = async (req, res) => {
         const match = await bcrypt.compare(params.password, user.password);
 
         if (match) {
-            const token = createToken(user);
+            const accessToken = createToken(user);
 
             res.status(200).send({
                 status: "success",
@@ -104,7 +104,7 @@ const login = async (req, res) => {
                     role: user.role,
                     status: user.status,
                     createdAt: user.createdAt,
-                    token: token
+                    accessToken: accessTokens
                 }
             });
         } else {
