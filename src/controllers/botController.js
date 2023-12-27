@@ -57,7 +57,7 @@ const register = async (req, res) => {
                     message: 'Bot already exists'
                 });
             }
-
+            
             const botStored = await bot.save();
 
             if (botStored) {
@@ -74,7 +74,8 @@ const register = async (req, res) => {
         } catch (err) {
             res.status(500).send({
                 status: "error",
-                message: 'Error saving bot'
+                message: 'Error saving bot process',
+                error: err
             });
         }
     }
