@@ -15,6 +15,6 @@ router.get('/start/:botId', check.auth, botController.start);
 
 router.get('/qr/:botId', check.auth, botController.qr);
 
-router.get('/list', check.auth, botController.list);
+router.get('/mybots', check.auth, botController.myList);
 
 module.exports = router;

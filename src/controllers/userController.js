@@ -104,7 +104,7 @@ const login = async (req, res) => {
                     role: user.role,
                     status: user.status,
                     createdAt: user.createdAt,
-                    accessToken: accessTokens
+                    accessToken: accessToken
                 }
             });
         } else {

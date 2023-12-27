@@ -8,7 +8,7 @@ const index = (req, res) => {
     res.json({ "message": 'Bienvenido a la Bot API - Autenticado', "user": req.user });
 };
 
-const list = async (req, res) => {
+const myList = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user.status) return res.status(401).send({
         status: "error",
@@ -151,6 +151,13 @@ const stop = async (req, res) => {
             });
         }
 
+        if (bot.finishedAt < Date.now()) {
+            return res.status(401).send({
+                status: "error",
+                message: 'Update your subscription'
+            })
+        }
+
         pm2.stop(bot.pm2, (err, description) => {
             if (err) {
                 console.error(err);
@@ -193,6 +200,13 @@ const start = async (req, res) => {
                 status: "error",
                 message: 'Unauthorized'
             });
+        }
+
+        if (bot.finishedAt < Date.now()) {
+            return res.status(401).send({
+                status: "error",
+                message: 'Update your subscription'
+            })
         }
 
         pm2.start(bot.pm2, (err, description) => {
@@ -254,5 +268,5 @@ const qr = async (req, res) => {
 }
 
 module.exports = {
-    index, register, status, qr, start, stop, list
+    index, register, status, qr, start, stop, myList
 };

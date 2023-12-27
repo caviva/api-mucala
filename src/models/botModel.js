@@ -24,6 +24,21 @@ const botSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    finishedAt: {
+        type: Date,
+    },
+    icon: {
+        type: String,
+        default: 'https://i.imgur.com/5lT1Z7J.png',
+    },
+    plan: {
+        type: String,
+        default: 'Starter',
+    },
+    price: {
+        type: Number,
+        default: 0,
+    },
 });
 
 module.exports = model('Bot', botSchema, 'bots');
