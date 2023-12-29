@@ -163,6 +163,8 @@ const stop = async (req, res) => {
             if (err) {
                 console.error(err);
             } else {
+                bot.status = !bot.status;
+                bot.save();
                 res.status(200).send({
                     status: "success",
                     message: 'Bot stopped successfully'
@@ -214,6 +216,8 @@ const start = async (req, res) => {
             if (err) {
                 console.error(err);
             } else {
+                bot.status = !bot.status;
+                bot.save();
                 res.status(200).send({
                     status: "success",
                     message: 'Bot started successfully'
